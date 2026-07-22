@@ -1,0 +1,1 @@
+// Stub — formatter implementation
