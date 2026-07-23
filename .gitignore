@@ -5,3 +5,6 @@ cmake-build-*/
 output/
 .vscode/
 .idea/
+compile_commands.json
+.clangd
+.superpowers/
