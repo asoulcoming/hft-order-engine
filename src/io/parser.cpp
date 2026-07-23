@@ -47,14 +47,14 @@ std::optional<Action> Parser::parse(const std::string& line) const {
 
         if (a.price <= 0) throw std::runtime_error("Invalid price");
         if (a.quantity == 0) throw std::runtime_error("Invalid quantity");
-        return a;
+        return Action{a};
     }
 
     if (cmd == "CANCEL") {
         CancelAction a;
         ss >> a.order_id;
         if (ss.fail()) throw std::runtime_error("Malformed CANCEL: " + line);
-        return a;
+        return Action{a};
     }
 
     if (cmd == "MODIFY") {
@@ -63,7 +63,7 @@ std::optional<Action> Parser::parse(const std::string& line) const {
         if (ss.fail()) throw std::runtime_error("Malformed MODIFY: " + line);
         if (a.new_price <= 0) throw std::runtime_error("Invalid price");
         if (a.new_qty == 0) throw std::runtime_error("Invalid quantity");
-        return a;
+        return Action{a};
     }
 
     if (cmd == "MARKET") {
@@ -78,11 +78,11 @@ std::optional<Action> Parser::parse(const std::string& line) const {
         else throw std::runtime_error("Unknown side: " + side_str);
 
         if (a.qty == 0) throw std::runtime_error("Invalid quantity");
-        return a;
+        return Action{a};
     }
 
     if (cmd == "PRINT") {
-        return PrintAction{};
+        return Action{PrintAction{}};
     }
 
     throw std::runtime_error("Unknown command: " + cmd);
