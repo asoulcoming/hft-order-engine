@@ -7,6 +7,7 @@ namespace hft {
 
 namespace {
 
+// 字符串转大写（支持大小写不敏感的命令解析）
 std::string upper(std::string s) {
     for (auto& c : s) c = static_cast<char>(std::toupper(static_cast<unsigned char>(c)));
     return s;
@@ -15,10 +16,12 @@ std::string upper(std::string s) {
 } // namespace
 
 std::optional<Action> Parser::parse(const std::string& line) const {
+    // 跳过前导空格
     size_t start = 0;
     while (start < line.size() && std::isspace(static_cast<unsigned char>(line[start])))
         ++start;
 
+    // 空行或注释行 → 无 Action
     if (start >= line.size()) return std::nullopt;
     if (line[start] == '#') return std::nullopt;
 
@@ -27,6 +30,8 @@ std::optional<Action> Parser::parse(const std::string& line) const {
     ss >> cmd;
     cmd = upper(cmd);
 
+    // ── SUBMIT 命令 ──────────────────────────────────────
+    // 格式：SUBMIT <id> <BUY|SELL> <price> <qty> [GTC|IOC|FOK]
     if (cmd == "SUBMIT") {
         SubmitAction a;
         std::string side_str;
@@ -38,6 +43,7 @@ std::optional<Action> Parser::parse(const std::string& line) const {
         else if (side_str == "SELL") a.side = Side::Sell;
         else throw std::runtime_error("Unknown side: " + side_str);
 
+        // 可选：订单类型（默认 GTC）
         std::string type_str;
         if (ss >> type_str) {
             type_str = upper(type_str);
@@ -50,6 +56,8 @@ std::optional<Action> Parser::parse(const std::string& line) const {
         return Action{a};
     }
 
+    // ── CANCEL 命令 ──────────────────────────────────────
+    // 格式：CANCEL <id>
     if (cmd == "CANCEL") {
         CancelAction a;
         ss >> a.order_id;
@@ -57,6 +65,8 @@ std::optional<Action> Parser::parse(const std::string& line) const {
         return Action{a};
     }
 
+    // ── MODIFY 命令 ──────────────────────────────────────
+    // 格式：MODIFY <id> <new_price> <new_qty>
     if (cmd == "MODIFY") {
         ModifyAction a;
         ss >> a.order_id >> a.new_price >> a.new_qty;
@@ -66,6 +76,8 @@ std::optional<Action> Parser::parse(const std::string& line) const {
         return Action{a};
     }
 
+    // ── MARKET 命令 ──────────────────────────────────────
+    // 格式：MARKET <id> <BUY|SELL> <qty>
     if (cmd == "MARKET") {
         MarketAction a;
         std::string side_str;
@@ -81,6 +93,7 @@ std::optional<Action> Parser::parse(const std::string& line) const {
         return Action{a};
     }
 
+    // ── PRINT 命令 ───────────────────────────────────────
     if (cmd == "PRINT") {
         return Action{PrintAction{}};
     }

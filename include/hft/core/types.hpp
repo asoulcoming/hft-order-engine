@@ -4,26 +4,26 @@
 
 namespace hft {
 
-// ── Type aliases ────────────────────────────────────────────
-using OrderId  = uint64_t;
-using Price    = int64_t;    // integer cents (e.g. $150.00 = 15000)
-using Quantity = uint64_t;
+// ── 类型别名 ────────────────────────────────────────────
+using OrderId  = uint64_t;   // 订单号
+using Price    = int64_t;    // 价格（整数分，如 $150.00 = 15000）
+using Quantity = uint64_t;   // 数量
 
-// ── Enums ───────────────────────────────────────────────────
+// ── 枚举 ─────────────────────────────────────────────────
 enum class Side : uint8_t { Buy, Sell };
 
 enum class OrderType : uint8_t {
-    GTC,   // Good 'Til Cancel — rest in book if unfilled
-    IOC,   // Immediate-or-Cancel — cancel unfilled remainder
-    FOK,   // Fill-or-Kill — fill entirely or reject entirely
+    GTC,   // 一直有效直到撤单 — 未成交部分挂单
+    IOC,   // 立即成交否则取消 — 未成交部分丢弃
+    FOK,   // 全部成交否则取消 — 不能全成则拒单
 };
 
 enum class RejectReason : uint8_t {
-    DuplicateOrderId,
-    UnknownOrderId,
-    InsufficientLiquidity,   // FOK couldn't fill
-    InvalidPrice,
-    InvalidQuantity,
+    DuplicateOrderId,          // 重复订单号
+    UnknownOrderId,            // 未知订单号
+    InsufficientLiquidity,     // 流动性不足（FOK 无法全成）
+    InvalidPrice,              // 价格无效
+    InvalidQuantity,           // 数量无效
 };
 
 } // namespace hft

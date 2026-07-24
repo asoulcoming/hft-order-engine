@@ -5,7 +5,7 @@
 
 namespace hft {
 
-// Returns a stable, single-line text representation of an event.
+// 事件格式化：将内部 Event 转为可读的单行文本
 [[nodiscard]] std::string format_event(const Event& event);
 
 } // namespace hft
