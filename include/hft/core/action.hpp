@@ -10,7 +10,7 @@ namespace hft {
 struct SubmitAction {
     OrderId   id;               // 订单号
     Side      side;             // 买卖方向
-    OrderType type = OrderType::GTC;  // 订单类型
+    OrderType type = OrderType::GFD;  // 订单类型
     Price     price;            // 限价
     Quantity  quantity;         // 数量
 };

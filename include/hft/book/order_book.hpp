@@ -13,7 +13,7 @@ namespace hft {
 // Iter 1 使用 std::map + std::deque（正确性优先），后续迭代逐步优化数据结构
 class OrderBook {
 public:
-    // 提交限价单（GTC/IOC/FOK）
+    // 提交限价单（GFD/IOC/FOK）
     void submit(Order order, std::vector<Event>& out);
     // 撤单
     void cancel(OrderId order_id, std::vector<Event>& out);

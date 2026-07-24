@@ -8,7 +8,7 @@ namespace hft {
 struct Order {
     OrderId   id;               // 订单唯一标识
     Side      side;             // 买卖方向
-    OrderType type     = OrderType::GTC;  // 订单类型，默认 GTC
+    OrderType type     = OrderType::GFD;  // 订单类型，默认 GFD
     Price     price;            // 限价（整数分）
     Quantity  quantity;         // 原始数量
     Quantity  filled_qty = 0;  // 已成交量

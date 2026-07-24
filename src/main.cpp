@@ -34,7 +34,7 @@ int main() {
             } else if constexpr (std::is_same_v<T, hft::ModifyAction>) {
                 book.modify(cmd.order_id, cmd.new_price, cmd.new_qty, events);
             } else if constexpr (std::is_same_v<T, hft::MarketAction>) {
-                book.market({cmd.id, cmd.side, hft::OrderType::GTC, 0, cmd.qty}, events);
+                book.market({cmd.id, cmd.side, hft::OrderType::GFD, 0, cmd.qty}, events);
             } else if constexpr (std::is_same_v<T, hft::PrintAction>) {
                 book.print(events);
             }

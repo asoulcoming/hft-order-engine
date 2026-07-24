@@ -6,9 +6,9 @@ using namespace hft;
 
 class PriceLevelTest : public ::testing::Test {
 protected:
-    Order buy1_{1, Side::Buy, OrderType::GTC, 10000, 100};
-    Order buy2_{2, Side::Buy, OrderType::GTC, 10000, 50};
-    Order buy3_{3, Side::Buy, OrderType::GTC, 10000, 200};
+    Order buy1_{1, Side::Buy, OrderType::GFD, 10000, 100};
+    Order buy2_{2, Side::Buy, OrderType::GFD, 10000, 50};
+    Order buy3_{3, Side::Buy, OrderType::GFD, 10000, 200};
 };
 
 TEST_F(PriceLevelTest, PushBackIncreasesCountAndVolume) {

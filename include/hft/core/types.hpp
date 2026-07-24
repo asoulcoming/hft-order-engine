@@ -10,10 +10,13 @@ using Price    = int64_t;    // 价格（整数分，如 $150.00 = 15000）
 using Quantity = uint64_t;   // 数量
 
 // ── 枚举 ─────────────────────────────────────────────────
-enum class Side : uint8_t { Buy, Sell };
+enum class Side : uint8_t { //使用uint8_t节省内存,只有一个字节，默认的类型是int，是4个字节
+    Buy, 
+    Sell 
+};
 
 enum class OrderType : uint8_t {
-    GTC,   // 一直有效直到撤单 — 未成交部分挂单
+    GFD,   // 当日有效（Good For Day）— 未成交部分挂单，收盘自动撤单
     IOC,   // 立即成交否则取消 — 未成交部分丢弃
     FOK,   // 全部成交否则取消 — 不能全成则拒单
 };

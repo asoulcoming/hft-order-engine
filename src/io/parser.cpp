@@ -43,7 +43,7 @@ std::optional<Action> Parser::parse(const std::string& line) const {
         else if (side_str == "SELL") a.side = Side::Sell;
         else throw std::runtime_error("Unknown side: " + side_str);
 
-        // 可选：订单类型（默认 GTC）
+        // 可选：订单类型（默认 GFD）
         std::string type_str;
         if (ss >> type_str) {
             type_str = upper(type_str);

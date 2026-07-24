@@ -120,8 +120,8 @@ void OrderBook::submit(Order order, std::vector<Event>& out) {
     // 3. 撮合
     match_aggressive(order, out);
 
-    // 4. GTC 且有余量 → 挂入本方订单簿
-    if (order.type == OrderType::GTC && order.remaining() > 0) {
+    // 4. GFD 且有余量 → 挂入本方订单簿
+    if (order.type == OrderType::GFD && order.remaining() > 0) {
         Order* stored = store_order(order);
 
         if (order.side == Side::Buy) {

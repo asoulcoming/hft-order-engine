@@ -4,10 +4,10 @@
 using namespace hft;
 
 static Order buy(uint64_t id, Price price, Quantity qty) {
-    return {id, Side::Buy, OrderType::GTC, price, qty};
+    return {id, Side::Buy, OrderType::GFD, price, qty};
 }
 static Order sell(uint64_t id, Price price, Quantity qty) {
-    return {id, Side::Sell, OrderType::GTC, price, qty};
+    return {id, Side::Sell, OrderType::GFD, price, qty};
 }
 
 TEST(OrderBookTest, AddSingleOrderNoMatch) {
@@ -209,7 +209,7 @@ TEST(OrderBookTest, MarketOrderFillsAgainstResting) {
     book.submit(sell(2, 10001, 30), events);
     events.clear();
 
-    book.market({3, Side::Buy, OrderType::GTC, 0, 40}, events);
+    book.market({3, Side::Buy, OrderType::GFD, 0, 40}, events);
 
     int trade_count = 0;
     Quantity total_filled = 0;
@@ -233,7 +233,7 @@ TEST(OrderBookTest, MarketOrderPartialNoRest) {
     book.submit(sell(1, 10000, 20), events);
     events.clear();
 
-    book.market({2, Side::Buy, OrderType::GTC, 0, 50}, events);
+    book.market({2, Side::Buy, OrderType::GFD, 0, 50}, events);
 
     const auto* trade = std::get_if<TradeEvent>(&events[0]);
     ASSERT_NE(trade, nullptr);

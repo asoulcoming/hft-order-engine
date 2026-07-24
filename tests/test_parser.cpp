@@ -23,7 +23,7 @@ TEST(ParserTest, ParseSubmitGtc) {
     ASSERT_NE(sub, nullptr);
     EXPECT_EQ(sub->id, 1);
     EXPECT_EQ(sub->side, Side::Buy);
-    EXPECT_EQ(sub->type, OrderType::GTC);
+    EXPECT_EQ(sub->type, OrderType::GFD);
     EXPECT_EQ(sub->price, 15000);
     EXPECT_EQ(sub->quantity, 100);
 }
