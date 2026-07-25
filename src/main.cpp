@@ -18,31 +18,35 @@ int main() {
             line.pop_back();
         }
 
-        auto action = parser.parse(line);
-        if (!action) continue;  // 空行或注释
+        try {
+            auto action = parser.parse(line);
+            if (!action) continue;  // 空行或注释
 
-        events.clear();  // 复用缓冲区
+            events.clear();  // 复用缓冲区
 
-        // 根据 Action 类型分发到 OrderBook 对应方法
-        std::visit([&](const auto& cmd) {
-            using T = std::decay_t<decltype(cmd)>;
+            // 根据 Action 类型分发到 OrderBook 对应方法
+            std::visit([&](const auto& cmd) {
+                using T = std::decay_t<decltype(cmd)>;
 
-            if constexpr (std::is_same_v<T, hft::SubmitAction>) {
-                book.submit({cmd.id, cmd.side, cmd.type, cmd.price, cmd.quantity}, events);
-            } else if constexpr (std::is_same_v<T, hft::CancelAction>) {
-                book.cancel(cmd.order_id, events);
-            } else if constexpr (std::is_same_v<T, hft::ModifyAction>) {
-                book.modify(cmd.order_id, cmd.new_price, cmd.new_qty, events);
-            } else if constexpr (std::is_same_v<T, hft::MarketAction>) {
-                book.market({cmd.id, cmd.side, hft::OrderType::GFD, 0, cmd.qty}, events);
-            } else if constexpr (std::is_same_v<T, hft::PrintAction>) {
-                book.print(events);
+                if constexpr (std::is_same_v<T, hft::SubmitAction>) {
+                    book.submit({cmd.id, cmd.side, cmd.type, cmd.price, cmd.quantity}, events);
+                } else if constexpr (std::is_same_v<T, hft::CancelAction>) {
+                    book.cancel(cmd.order_id, events);
+                } else if constexpr (std::is_same_v<T, hft::ModifyAction>) {
+                    book.modify(cmd.order_id, cmd.new_price, cmd.new_qty, events);
+                } else if constexpr (std::is_same_v<T, hft::MarketAction>) {
+                    book.market({cmd.id, cmd.side, hft::OrderType::GFD, 0, cmd.qty}, events);
+                } else if constexpr (std::is_same_v<T, hft::PrintAction>) {
+                    book.print(events);
+                }
+            }, *action);
+
+            // 输出所有生成的事件
+            for (const auto& ev : events) {
+                std::cout << hft::format_event(ev) << "\n";
             }
-        }, *action);
-
-        // 输出所有生成的事件
-        for (const auto& ev : events) {
-            std::cout << hft::format_event(ev) << "\n";
+        } catch (const std::exception& e) {
+            std::cerr << "ERROR: " << e.what() << "\n";
         }
     }
 
