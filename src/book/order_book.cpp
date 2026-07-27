@@ -230,14 +230,22 @@ void OrderBook::print(std::vector<Event>& out) const {
     if (!asks_.empty()) {
         oss << "Asks (Sell):\n";
         for (const auto& [price, level] : asks_) {
-            oss << "  " << price << " : " << level.total_volume << "\n";
+            oss << "  " << price << " : " << level.total_volume;
+            for (const auto* o : level.orders) {
+                oss << "  [id=" << o->id << " qty=" << o->remaining() << "]";
+            }
+            oss << "\n";
         }
     }
 
     if (!bids_.empty()) {
         oss << "Bids (Buy):\n";
         for (const auto& [price, level] : bids_) {
-            oss << "  " << price << " : " << level.total_volume << "\n";
+            oss << "  " << price << " : " << level.total_volume;
+            for (const auto* o : level.orders) {
+                oss << "  [id=" << o->id << " qty=" << o->remaining() << "]";
+            }
+            oss << "\n";
         }
     }
 
