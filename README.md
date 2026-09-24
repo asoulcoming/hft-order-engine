@@ -4,11 +4,12 @@ A low-latency limit order book matching engine built in C++20, developed iterati
 from correctness-first to cache-optimized. This project is designed as a learning
 journey toward quantitative trading system development.
 
-**Current: Iteration 1 — Make it Work**
+**Current: Engine Iteration 1 complete — starting Stage 0 of the [trading-system roadmap](ROADMAP.md)**
 
-Uses `std::map` + `std::deque` for correctness-first implementation. Later iterations
-will progressively introduce flat arrays, intrusive linked lists, memory pools, and
-deterministic replay.
+Iteration 1 uses `std::map` + `std::deque` for a correctness-first implementation.
+The project now targets a full, production-grade HFT trading system (market data,
+strategy, risk, OMS, gateway, backtesting) — see [ROADMAP.md](ROADMAP.md) for the
+staged plan with acceptance gates, and [JOURNAL.md](JOURNAL.md) for the progress log.
 
 ## Quick Start
 
@@ -53,7 +54,7 @@ ctest --test-dir build --output-on-failure
 
 | Command | Format | Example |
 |---|---|---|
-| SUBMIT | `SUBMIT <id> <BUY\|SELL> <price> <qty> [GTC\|IOC\|FOK]` | `SUBMIT 1 BUY 15000 100 GTC` |
+| SUBMIT | `SUBMIT <id> <BUY\|SELL> <price> <qty> [GFD\|IOC\|FOK]` | `SUBMIT 1 BUY 15000 100 GFD` |
 | CANCEL | `CANCEL <id>` | `CANCEL 1` |
 | MODIFY | `MODIFY <id> <new_price> <new_qty>` | `MODIFY 1 15100 200` |
 | MARKET | `MARKET <id> <BUY\|SELL> <qty>` | `MARKET 3 BUY 50` |
@@ -83,13 +84,19 @@ tests/                → GoogleTest suite (41 tests) + fixtures
 
 ## Roadmap
 
-| Iteration | Theme | Goal |
+The project follows a staged trading-system roadmap. Full details and acceptance
+gates live in [ROADMAP.md](ROADMAP.md); progress is logged in [JOURNAL.md](JOURNAL.md).
+
+| Stage | Theme | Status |
 |---|---|---|
-| 1 (current) | Make it work | Correctness with std::map + std::deque |
-| 2 | Make it right | Flat array price levels, tick pricing |
-| 3 | Make it fast | Intrusive lists, memory pool, zero-alloc |
-| 4 | Make it reliable | Benchmark suite, flamegraph, replay |
-| 5 | Make it real | CTP/XTP exchange gateway |
+| 0 | Engineering foundation (CI, lint, journal) | in progress |
+| 1 | Engine: make it right (flat arrays, multi-symbol, replay tests) | |
+| 2 | Engine: make it fast (intrusive lists, memory pool, benchmarks) | |
+| 3 | Engine: make it reliable (deterministic replay, WAL, crash recovery) | |
+| 4 | Backtesting framework (data → strategy → simulated fills → report) | |
+| 5 | Live simulation loop (testnet: market data / strategy / risk / OMS / gateway) | |
+| 6 | Strategy & execution depth (real strategies, execution algos, latency tracing) | |
+| 7 | Small-size live trading (optional, gated by strict preconditions) | |
 
 ## References
 
