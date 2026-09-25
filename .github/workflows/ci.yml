@@ -1,0 +1,61 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  # ── 构建 + 全量测试 ──────────────────────────────────────
+  build-test:
+    name: 构建 + 测试 (gcc / Release)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Configure
+        run: cmake -S . -B build -DCMAKE_BUILD_TYPE=Release
+      - name: Build
+        run: cmake --build build -j
+      - name: Test
+        run: ctest --test-dir build --output-on-failure
+
+  # ── 内存安全:AddressSanitizer + UndefinedBehaviorSanitizer ──
+  sanitizers:
+    name: ASan + UBSan (clang / Debug)
+    runs-on: ubuntu-latest
+    env:
+      ASAN_OPTIONS: detect_leaks=1:abort_on_error=1
+    steps:
+      - uses: actions/checkout@v4
+      - name: 安装 clang
+        run: sudo apt-get update -q && sudo apt-get install -y -q clang
+      # Ubuntu 24.04 内核 6.8+ 上 ASan 影子内存分配的已知规避
+      - name: ASan shadow memory workaround
+        run: sudo sysctl vm.mmap_rlimit_bits=28
+      - name: Configure
+        run: >
+          cmake -S . -B build -DCMAKE_BUILD_TYPE=Debug -DCMAKE_CXX_COMPILER=clang++
+          -DCMAKE_CXX_FLAGS="-fsanitize=address,undefined -fno-omit-frame-pointer"
+          -DCMAKE_EXE_LINKER_FLAGS="-fsanitize=address,undefined"
+      - name: Build
+        run: cmake --build build -j
+      - name: Test
+        run: ctest --test-dir build --output-on-failure
+
+  # ── 格式检查 + 静态分析 ──────────────────────────────────
+  lint:
+    name: clang-format 检查 + clang-tidy
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: 安装工具
+        run: |
+          sudo apt-get update -q && sudo apt-get install -y -q clang-tidy
+          python3 -m pip install clang-format==23.1.1
+      - name: clang-format 检查
+        run: find src include tests \( -name '*.cpp' -o -name '*.hpp' \) -print0 |
+          xargs -0 clang-format --dry-run -Werror
+      - name: Configure(生成 compile_commands.json)
+        run: cmake -S . -B build -DCMAKE_BUILD_TYPE=Release
+      - name: clang-tidy
+        run: clang-tidy -p build src/main.cpp src/book/order_book.cpp src/io/parser.cpp src/io/formatter.cpp
