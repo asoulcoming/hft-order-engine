@@ -44,3 +44,4 @@
 | 2026-09-24 | [roadmap-replan](docs/journal/2026-09-24-roadmap-replan.md) | 路线重定:升级为 8 阶段交易系统 ROADMAP,建立过程记录 |
 | 2026-09-25 | [references-submodule](docs/journal/2026-09-25-references-submodule.md) | 文档推送;参考项目 submodule(当天即撤销,见下一行) |
 | 2026-09-25 | [docs-reorg](docs/journal/2026-09-25-docs-reorg.md) | 仓库整理:移除 submodule、拆分过程文档、删 superpowers 残留 |
+| 2026-09-25 | [readme-chinese](docs/journal/2026-09-25-readme-chinese.md) | README 中文化,统一仓库文档语言 |
