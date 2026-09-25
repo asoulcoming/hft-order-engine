@@ -1,7 +1,7 @@
 #include "hft/io/parser.hpp"
+#include <cctype>
 #include <sstream>
 #include <stdexcept>
-#include <cctype>
 
 namespace hft {
 
@@ -9,7 +9,8 @@ namespace {
 
 // 字符串转大写（支持大小写不敏感的命令解析）
 std::string upper(std::string s) {
-    for (auto& c : s) c = static_cast<char>(std::toupper(static_cast<unsigned char>(c)));
+    for (auto& c : s)
+        c = static_cast<char>(std::toupper(static_cast<unsigned char>(c)));
     return s;
 }
 
@@ -22,8 +23,10 @@ std::optional<Action> Parser::parse(const std::string& line) const {
         ++start;
 
     // 空行或注释行 → 无 Action
-    if (start >= line.size()) return std::nullopt;
-    if (line[start] == '#') return std::nullopt;
+    if (start >= line.size())
+        return std::nullopt;
+    if (line[start] == '#')
+        return std::nullopt;
 
     std::istringstream ss(line.substr(start));
     std::string cmd;
@@ -31,28 +34,40 @@ std::optional<Action> Parser::parse(const std::string& line) const {
     cmd = upper(cmd);
 
     // ── SUBMIT 命令 ──────────────────────────────────────
-    // 格式：SUBMIT <id> <BUY|SELL> <price> <qty> [GTC|IOC|FOK]
+    // 格式：SUBMIT <id> <BUY|SELL> <price> <qty> [GFD|IOC|FOK]
     if (cmd == "SUBMIT") {
         SubmitAction a;
         std::string side_str;
         ss >> a.id >> side_str >> a.price >> a.quantity;
-        if (ss.fail()) throw std::runtime_error("Malformed SUBMIT: " + line);
+        if (ss.fail())
+            throw std::runtime_error("Malformed SUBMIT: " + line);
 
         side_str = upper(side_str);
-        if (side_str == "BUY") a.side = Side::Buy;
-        else if (side_str == "SELL") a.side = Side::Sell;
-        else throw std::runtime_error("Unknown side: " + side_str);
+        if (side_str == "BUY")
+            a.side = Side::Buy;
+        else if (side_str == "SELL")
+            a.side = Side::Sell;
+        else
+            throw std::runtime_error("Unknown side: " + side_str);
 
-        // 可选：订单类型（默认 GFD）
+        // 可选：订单类型（缺省 GFD）；显式给出时只接受三种，未知类型必须报错
         std::string type_str;
         if (ss >> type_str) {
             type_str = upper(type_str);
-            if (type_str == "IOC") a.type = OrderType::IOC;
-            else if (type_str == "FOK") a.type = OrderType::FOK;
+            if (type_str == "GFD")
+                a.type = OrderType::GFD;
+            else if (type_str == "IOC")
+                a.type = OrderType::IOC;
+            else if (type_str == "FOK")
+                a.type = OrderType::FOK;
+            else
+                throw std::runtime_error("Unknown order type: " + type_str);
         }
 
-        if (a.price <= 0) throw std::runtime_error("Invalid price");
-        if (a.quantity == 0) throw std::runtime_error("Invalid quantity");
+        if (a.price <= 0)
+            throw std::runtime_error("Invalid price");
+        if (a.quantity == 0)
+            throw std::runtime_error("Invalid quantity");
         return Action{a};
     }
 
@@ -61,7 +76,8 @@ std::optional<Action> Parser::parse(const std::string& line) const {
     if (cmd == "CANCEL") {
         CancelAction a;
         ss >> a.order_id;
-        if (ss.fail()) throw std::runtime_error("Malformed CANCEL: " + line);
+        if (ss.fail())
+            throw std::runtime_error("Malformed CANCEL: " + line);
         return Action{a};
     }
 
@@ -70,9 +86,12 @@ std::optional<Action> Parser::parse(const std::string& line) const {
     if (cmd == "MODIFY") {
         ModifyAction a;
         ss >> a.order_id >> a.new_price >> a.new_qty;
-        if (ss.fail()) throw std::runtime_error("Malformed MODIFY: " + line);
-        if (a.new_price <= 0) throw std::runtime_error("Invalid price");
-        if (a.new_qty == 0) throw std::runtime_error("Invalid quantity");
+        if (ss.fail())
+            throw std::runtime_error("Malformed MODIFY: " + line);
+        if (a.new_price <= 0)
+            throw std::runtime_error("Invalid price");
+        if (a.new_qty == 0)
+            throw std::runtime_error("Invalid quantity");
         return Action{a};
     }
 
@@ -82,14 +101,19 @@ std::optional<Action> Parser::parse(const std::string& line) const {
         MarketAction a;
         std::string side_str;
         ss >> a.id >> side_str >> a.qty;
-        if (ss.fail()) throw std::runtime_error("Malformed MARKET: " + line);
+        if (ss.fail())
+            throw std::runtime_error("Malformed MARKET: " + line);
 
         side_str = upper(side_str);
-        if (side_str == "BUY") a.side = Side::Buy;
-        else if (side_str == "SELL") a.side = Side::Sell;
-        else throw std::runtime_error("Unknown side: " + side_str);
+        if (side_str == "BUY")
+            a.side = Side::Buy;
+        else if (side_str == "SELL")
+            a.side = Side::Sell;
+        else
+            throw std::runtime_error("Unknown side: " + side_str);
 
-        if (a.qty == 0) throw std::runtime_error("Invalid quantity");
+        if (a.qty == 0)
+            throw std::runtime_error("Invalid quantity");
         return Action{a};
     }
 

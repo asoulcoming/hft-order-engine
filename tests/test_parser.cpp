@@ -15,7 +15,7 @@ TEST(ParserTest, CommentReturnsNullopt) {
     EXPECT_EQ(p.parse("# this is a comment"), std::nullopt);
 }
 
-TEST(ParserTest, ParseSubmitGtc) {
+TEST(ParserTest, ParseSubmitDefaultsToGfd) {
     Parser p;
     auto result = p.parse("SUBMIT 1 BUY 15000 100");
     ASSERT_TRUE(result.has_value());
@@ -44,6 +44,22 @@ TEST(ParserTest, ParseSubmitFok) {
     auto* sub = std::get_if<SubmitAction>(&*result);
     ASSERT_NE(sub, nullptr);
     EXPECT_EQ(sub->type, OrderType::FOK);
+}
+
+TEST(ParserTest, ParseSubmitExplicitGfd) {
+    Parser p;
+    auto result = p.parse("SUBMIT 4 SELL 25000 20 gfd");
+    ASSERT_TRUE(result.has_value());
+    auto* sub = std::get_if<SubmitAction>(&*result);
+    ASSERT_NE(sub, nullptr);
+    EXPECT_EQ(sub->type, OrderType::GFD);
+}
+
+TEST(ParserTest, UnknownOrderTypeThrows) {
+    Parser p;
+    // 曾有 bug：未知订单类型（如旧名 GTC）被静默按 GFD 处理，必须改为报错
+    EXPECT_THROW(p.parse("SUBMIT 1 BUY 15000 100 GTC"), std::runtime_error);
+    EXPECT_THROW(p.parse("SUBMIT 1 BUY 15000 100 XYZ"), std::runtime_error);
 }
 
 TEST(ParserTest, ParseCancel) {
