@@ -11,7 +11,7 @@
 
 本项目会跨很多次对话、多个模型版本推进。为了让任何一次新对话都能无缝接上,约定如下:
 
-1. **开工前必读**:本文件 + `JOURNAL.md` 顶部"当前状态块"和最后 3 条记录。读这两处就足够开工,不需要翻聊天历史。
+1. **开工前必读**:本文件 + `JOURNAL.md`(顶部"当前状态块"、条目模板与索引)。需要细节时按索引打开 `docs/journal/` 里最新的 1–2 条记录。读这些就足够开工,不需要翻聊天历史。
 2. **状态权威顺序**:`JOURNAL.md` 顶部状态块(最新)> 本文件 §4 总览表的状态列 > README.md。三者冲突时以更新时间新的为准,并顺手把旧的改对。
 3. **推进纪律**:**只有当前阶段取得"完全的胜利"(过 §5 该阶段的 Gate + §6 验收方法论四关),才允许进入下一阶段**。不跳阶段,不做"顺手把下阶段的东西也写了"。推进中发现别的想法,记入 JOURNAL 的"下一步",不当场改道。
 4. **修改规则**:
@@ -144,8 +144,8 @@
 
 ## §5 各阶段详情
 
-> 每阶段的"参考"均指向三个参考仓库(已作为 **git submodule** 固化在本仓库 `references/` 目录,换电脑 `git clone --recursive` 或 `git submodule update --init --recursive` 即得,并锁定参考时的 commit 版本)及其 GitHub 源:
-> `references/Simple-HFT-Engine`(saksham10arora-dotcom)、`references/low-latency-matching-engine`(erictzhou)、`references/order-matching-engine`(PIYUSH-KUMAR1809)。
+> 每阶段的"参考"均指向三个参考仓库。它们**不进本仓库**(决策见 `docs/journal/2026-09-25-docs-reorg.md`),位于本地 HFT 工作目录下本仓库的**兄弟目录**;换电脑时按 README References 节的三条 clone 命令重新拉取:
+> `../Simple-HFT-Engine`(saksham10arora-dotcom)、`../low-latency-matching-engine`(erictzhou)、`../order-matching-engine`(PIYUSH-KUMAR1809)。
 
 ### Stage 0 — 工程基座与记录体系
 
@@ -177,13 +177,13 @@
 **任务清单**:
 - [ ] tick 定价:定义 TickSize 与价格合法域,非法价用已定义的 `InvalidPrice` 拒单;评估内部表示保留 int64 最小价位 vs 直接存 tick 索引(写决策记录进 JOURNAL)
 - [ ] 平坦数组价格档位:`std::vector<PriceLevel>` 按 tick 直接索引。两条参考路线:
-  - `references/Simple-HFT-Engine/include/OrderBook.hpp`(flat array,配 Stage 2 的侵入式链表)
-  - `references/order-matching-engine/src/OrderBook.hpp` + `src/Bitset.hpp`(tombstone + headIndex + `__builtin_ctzll/clzll` 位图瞬移跳过空档)
+  - `../Simple-HFT-Engine/include/OrderBook.hpp`(flat array,配 Stage 2 的侵入式链表)
+  - `../order-matching-engine/src/OrderBook.hpp` + `src/Bitset.hpp`(tombstone + headIndex + `__builtin_ctzll/clzll` 位图瞬移跳过空档)
   - 本阶段先做"直索引 + 位图找活跃档",稀疏大价差的内存问题在 JOURNAL 记录数据再决定是否加密
-- [ ] 多标的 Exchange 层:symbol → OrderBook 路由 + 全局 order_to_book 索引(cancel 不扫 symbol)。参考 `references/low-latency-matching-engine` 的 ARCHITECTURE.md exchange 层与 `order_to_book_` 设计
-- [ ] Golden replay 测试:`tests/replay/` 每组 = 输入命令带 + `.expected` 期望输出带,byte-exact 比对(组织方式参考 `references/low-latency-matching-engine/tests/replay/`,16 组夹具)
+- [ ] 多标的 Exchange 层:symbol → OrderBook 路由 + 全局 order_to_book 索引(cancel 不扫 symbol)。参考 `../low-latency-matching-engine` 的 ARCHITECTURE.md exchange 层与 `order_to_book_` 设计
+- [ ] Golden replay 测试:`tests/replay/` 每组 = 输入命令带 + `.expected` 期望输出带,byte-exact 比对(组织方式参考 `../low-latency-matching-engine/tests/replay/`,16 组夹具)
 - [ ] Invariant 随机化测试:固定种子生成随机操作流,校验守恒不变量(买卖量守恒、book 与索引一致、事件流无矛盾);种子可重放
-- [ ] 旧 map 版引擎**保留**为对照(挪 `legacy/` 或 CMake 双引擎选项),同 workload 出对比表(做法参考 `references/Simple-HFT-Engine/research/` 的三架构同种子对比 + CSV)
+- [ ] 旧 map 版引擎**保留**为对照(挪 `legacy/` 或 CMake 双引擎选项),同 workload 出对比表(做法参考 `../Simple-HFT-Engine/research/` 的三架构同种子对比 + CSV)
 
 **交付物**:新引擎结构、Exchange 层、replay/invariant 测试体系、新旧架构对照脚本。
 
@@ -200,11 +200,11 @@
 **为什么**:这一步练的是"用数据结构换缓存"的硬功夫,产出物(侵入式链表、内存池、零分配)会原样搬进 Stage 5 的行情热路径。
 
 **任务清单**:
-- [ ] 侵入式双链表:Order 加 prev/next,PriceLevel 只存 head/tail + total_volume,cancel O(1) 解链;`static_assert(sizeof(Order) <= 64)` 保证单缓存行(参考 `references/Simple-HFT-Engine/include/PriceLevel.hpp`、`include/Order.hpp`)
-- [ ] 内存池:bump-pointer + free-list(参考 `references/Simple-HFT-Engine/include/MemoryPool.hpp`)vs `std::pmr::monotonic_buffer_resource` + fallback(参考 `references/order-matching-engine/src/OrderBook.cpp`)——两条路线都做微基准再选,决策记 JOURNAL
+- [ ] 侵入式双链表:Order 加 prev/next,PriceLevel 只存 head/tail + total_volume,cancel O(1) 解链;`static_assert(sizeof(Order) <= 64)` 保证单缓存行(参考 `../Simple-HFT-Engine/include/PriceLevel.hpp`、`include/Order.hpp`)
+- [ ] 内存池:bump-pointer + free-list(参考 `../Simple-HFT-Engine/include/MemoryPool.hpp`)vs `std::pmr::monotonic_buffer_resource` + fallback(参考 `../order-matching-engine/src/OrderBook.cpp`)——两条路线都做微基准再选,决策记 JOURNAL
 - [ ] 热路径零分配:写一个分配计数器(全局 new 钩子或 pmr 计数 resource),测试断言"N 单撮合零堆分配"
-- [ ] Google Benchmark(FetchContent):三类基准——逐操作吞吐、混合流(submit/cancel/modify 按比例)、**单笔延迟**(≥1M 样本,nearest-rank p50/p95/p99/p999)。方法论照抄 `references/low-latency-matching-engine/benchmarks/`:钉核(taskset)、预生成 workload 在计时环外、计时环内零 I/O、`DoNotOptimize/ClobberMemory`、明确"批量摊销延迟 ≠ 单笔尾延迟"
-- [ ] BENCHMARKS.md 首版:环境元数据(编译器/CPU/构建选项)+ 方法论 + 数字表 + 每项优化的"瓶颈→依据→修复→收益"四要素(结构照抄 `references/low-latency-matching-engine/BENCHMARKS.md`)
+- [ ] Google Benchmark(FetchContent):三类基准——逐操作吞吐、混合流(submit/cancel/modify 按比例)、**单笔延迟**(≥1M 样本,nearest-rank p50/p95/p99/p999)。方法论照抄 `../low-latency-matching-engine/benchmarks/`:钉核(taskset)、预生成 workload 在计时环外、计时环内零 I/O、`DoNotOptimize/ClobberMemory`、明确"批量摊销延迟 ≠ 单笔尾延迟"
+- [ ] BENCHMARKS.md 首版:环境元数据(编译器/CPU/构建选项)+ 方法论 + 数字表 + 每项优化的"瓶颈→依据→修复→收益"四要素(结构照抄 `../low-latency-matching-engine/BENCHMARKS.md`)
 
 **交付物**:优化后的引擎、benchmark 套件、BENCHMARKS.md、零分配证明测试。
 
@@ -225,7 +225,7 @@
 - [ ] 确定性回放:定义操作日志(journal)格式,重放器读日志逐条喂引擎;同日志 → 同事件流 byte-exact,且 Debug/Release、跨机器一致(时间戳、指针、迭代顺序等非确定性来源要清零)
 - [ ] WAL + 快照崩溃恢复:写前日志 + 周期快照;恢复 = 载最近快照 + 重放 WAL 尾部;崩溃注入测试(kill -9 随机时刻 ≥100 次,恢复后状态与连续运行一致)
 - [ ] perf/flamegraph(Linux;mac 用 Instruments Time Profiler 替代,只做诊断不做正式数字);至少完成一次"看火焰图→定位→优化"的闭环并记录
-- [ ] 基准历史:每次正式基准结果入库(SQLite 或 md 表,含 commit hash、环境元数据;参考 `references/low-latency-matching-engine/benchmarks/benchmark_history` 的 schema 思路)
+- [ ] 基准历史:每次正式基准结果入库(SQLite 或 md 表,含 commit hash、环境元数据;参考 `../low-latency-matching-engine/benchmarks/benchmark_history` 的 schema 思路)
 
 **交付物**:journal 格式与重放器、WAL+快照+恢复、火焰图与优化闭环记录、基准历史库。
 
@@ -243,7 +243,7 @@
 
 **任务清单**:
 - [ ] 行情数据模型:tick 级事件流(snapshot + incremental L2 档位,或 trade+BBO 聚合,按目标市场数据可得性定,决策记 JOURNAL);时间戳统一用**交易所事件时间**
-- [ ] 数据获取:币安官方历史数据下载(data.binance.vision)+ 自录脚本(参考 `references/order-matching-engine/scripts/record_l3_data.py` 的做法)
+- [ ] 数据获取:币安官方历史数据下载(data.binance.vision)+ 自录脚本(参考 `../order-matching-engine/scripts/record_l3_data.py` 的做法)
 - [ ] 策略接口(C++):`on_book_update / on_trade / on_order_update` + 下单上下文(submit/cancel);**回测与实时同一接口**——这是 §3 核心原则的落点,接口评审时逐条检查"有没有偷偷依赖回测特有信息"
 - [ ] 模拟交易所:撮合引擎包装成 ExecutionHandler;滑点/手续费/排队位置模型第一版从简(固定费率 + 可配延迟),**模型假设必须写文档**
 - [ ] 回测运行器:数据流 → 策略 → 模拟成交 → 回报 → 事件日志;回测虚拟时钟
@@ -267,7 +267,7 @@
 
 **任务清单**:
 - [ ] 行情接入:WebSocket(库选型记录:Boost.Beast vs IXWebSocket vs 自写,决策进 JOURNAL);增量订单簿镜像:snapshot + diff + **序号连续性校验** + 心跳超时重连
-- [ ] 运行时线程模型:**单线程事件循环起步**(策略+风控+OMS 同线程;行情线程只做解析,经 SPSC ring 投递)。刻意简单,分片多线程是可选扩展——理由:先把正确性做实,并发是乘法不是加法。SPSC 参考真无锁实现 `references/Simple-HFT-Engine/include/SPSCRing.hpp`(acquire/release + 2^n 容量 + head/tail 分缓存行;**不要**参考 order-matching 的 RingBuffer——它 README 写 lock-free,实现是自旋锁)
+- [ ] 运行时线程模型:**单线程事件循环起步**(策略+风控+OMS 同线程;行情线程只做解析,经 SPSC ring 投递)。刻意简单,分片多线程是可选扩展——理由:先把正确性做实,并发是乘法不是加法。SPSC 参考真无锁实现 `../Simple-HFT-Engine/include/SPSCRing.hpp`(acquire/release + 2^n 容量 + head/tail 分缓存行;**不要**参考 order-matching 的 RingBuffer——它 README 写 lock-free,实现是自旋锁)
 - [ ] 下单网关抽象 + 币安 testnet 实现(REST 下单 + WebSocket 回报流)
 - [ ] OMS:订单状态机(Submitted→Accepted→PartiallyFilled→Filled/Canceled/Rejected + 异常态);幂等(回报重复/乱序/未知单号)
 - [ ] 风控 v1(硬限制,任何下单路径前置、不可绕过):最大仓位、单笔上限、每秒下单频率、日内亏损熔断、连续拒单熔断
@@ -334,7 +334,7 @@
 - CTP/SimNow 网关:国内期货,求职对口;需要 Linux 服务器跑 SDK;实现为又一个 ExchangeGateway 适配器,复用全部核心
 - 多标的分片多线程:shard-per-core(order-matching 路线)+ Simple-HFT 的真无锁 SPSC
 - Python 研究层:pybind11 暴露回测与数据
-- 监控面板:Streamlit(参考 `references/order-matching-engine/dashboard.py`)
+- 监控面板:Streamlit(参考 `../order-matching-engine/dashboard.py`)
 - DPDK/AF_XDP 内核旁路:先 ROI 评估再立项
 
 ---
@@ -366,7 +366,7 @@
 - 环境:钉核(taskset)、Release + `-DNDEBUG`、固定 RNG 种子、预生成 workload 在计时环外、计时环内零 I/O、`DoNotOptimize` 防优化掉;
 - 延迟:批量摊销延迟与单笔延迟**分列**,单笔延迟 ≥1M 样本出 nearest-rank 分位数;passive 与 aggressive 分开测;
 - 口径:本地 mac = 开发反馈(标注清楚);正式数字 = Linux + 钉核 + 记录环境元数据(commit hash、编译器、lscpu);
-- 诚实:测不出来的就说测不出来;被反压/插桩影响的指标要标注;基准太好看必有诈(参考 `references/Simple-HFT-Engine/docs/dev_blog.md` 的 Lesson 1)。
+- 诚实:测不出来的就说测不出来;被反压/插桩影响的指标要标注;基准太好看必有诈(参考 `../Simple-HFT-Engine/docs/dev_blog.md` 的 Lesson 1)。
 
 ### 6.4 JOURNAL 记录要求
 
@@ -387,9 +387,11 @@
 | 5 | 时间投入不稳定(历史上停滞 2 个月) | 节奏 | 量级只是参考,Gate 是唯一标准;停滞恢复时从 JOURNAL 状态块续 |
 | 6 | 模型/对话更替导致上下文丢失 | 连续性 | §0 使用协议 + JOURNAL 状态块,新对话只读两个文件即可接上 |
 | 7 | 单人项目无外部评审,决策盲区 | 质量 | JOURNAL 强制写"备选方案及为何没选";重要接口做书面设计评审(自评也算) |
+| 8 | 参考项目不在本仓库(本地兄弟目录),换电脑需手动 clone | 文档引用路径失效 | README References 固化三条 clone 命令;ROADMAP 路径统一用 `../` 兄弟目录 |
 
 ## §8 变更记录
 
 | 日期 | 版本 | 变更 |
 |---|---|---|
 | 2026-09-24 | v1 | 初版:将原 5 迭代撮合引擎路线升级为 8 阶段交易系统路线;建立 §0 跨对话使用协议;方向性决策(币安优先/C++全栈/小额实盘)按推荐默认设定,待用户确认 |
+| 2026-09-25 | v1.1 | 仓库整理:移除参考项目 submodule(引用改回 `../` 本地兄弟目录,clone 命令见 README);过程记录拆分为 `docs/journal/` 单文件,`JOURNAL.md` 变为索引;删除 superpowers 脚手架文档 |

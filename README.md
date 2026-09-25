@@ -100,9 +100,15 @@ gates live in [ROADMAP.md](ROADMAP.md); progress is logged in [JOURNAL.md](JOURN
 
 ## References
 
-Three open-source matching engines, vendored as git submodules under
-`references/` (clone this repo with `--recursive`, or run
-`git submodule update --init --recursive` in an existing checkout):
+Three open-source matching engines used as study references. They are **not**
+vendored in this repo — keep them as sibling directories of this checkout
+(ROADMAP.md cites them as `../<name>`):
+
+```bash
+git clone https://github.com/saksham10arora-dotcom/Simple-HFT-Engine.git ../Simple-HFT-Engine
+git clone https://github.com/erictzhou/low-latency-matching-engine.git ../low-latency-matching-engine
+git clone https://github.com/PIYUSH-KUMAR1809/order-matching-engine.git ../order-matching-engine
+```
 
 - [Simple-HFT-Engine](https://github.com/saksham10arora-dotcom/Simple-HFT-Engine)
 - [low-latency-matching-engine](https://github.com/erictzhou/low-latency-matching-engine)
