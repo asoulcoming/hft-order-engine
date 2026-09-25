@@ -29,9 +29,10 @@ jobs:
       - uses: actions/checkout@v4
       - name: 安装 clang
         run: sudo apt-get update -q && sudo apt-get install -y -q clang
-      # Ubuntu 24.04 内核 6.8+ 上 ASan 影子内存分配的已知规避
+      # Ubuntu 24.04 内核 6.8+ 上 ASan 影子内存分配的已知规避;
+      # 部分内核无此参数,拿不到就跳过,让 Test 步骤暴露真实问题
       - name: ASan shadow memory workaround
-        run: sudo sysctl -w vm.mmap_rlimit_bits=28
+        run: sudo sysctl -w vm.mmap_rlimit_bits=28 || true
       - name: Configure
         run: >
           cmake -S . -B build -DCMAKE_BUILD_TYPE=Debug -DCMAKE_CXX_COMPILER=clang++
