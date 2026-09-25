@@ -76,21 +76,22 @@
 
 ---
 
-## §2 现状快照(2026-09-24,每阶段结束时更新本节)
+## §2 现状快照(2026-09-25 Stage 0 完成后,每阶段结束时更新本节)
 
-- **Iteration 1(Make it Work)已完成**:`std::map` + `std::deque` 正确性基线,价格-时间优先、GFD/IOC/FOK/市价单、撤单/改单、PRINT,41 个 GoogleTest 全过(price_level 8 + orderbook 21 + parser 12);
-- 最后提交 2026-07-27,之后停滞约 2 个月;
-- 目录:`include/hft/{core,book,io}` + `src/` + `tests/`,GoogleTest 经 FetchContent 引入(已配置 `FETCHCONTENT_UPDATES_DISCONNECTED`,重配置 0.4s);
-- **没有** CI、.clang-format/.clang-tidy、benchmark、多标的 Exchange 层、过程记录文件(本次 ROADMAP/JOURNAL 已补上最后一样)。
+- **Iteration 1(Make it Work)已完成**:`std::map` + `std::deque` 正确性基线,价格-时间优先、GFD/IOC/FOK/市价单、撤单/改单、PRINT,43 个 GoogleTest 全过(price_level 8 + orderbook 21 + parser 14);
+- **Stage 0(工程基座)已完成(2026-09-25,tag `stage-0-clear`)**:GitHub Actions CI 三任务(构建+测试 / ASan+UBSan / clang-format+clang-tidy)全绿;.clang-format/.clang-tidy 就位并全仓格式化;gtest 发现模式已改 PRE_TEST(规避并行构建串注册,详见 `docs/journal/2026-09-25-stage0-clear.md`);
+- 目录:`include/hft/{core,book,io}` + `src/` + `tests/`,GoogleTest 经 FetchContent 引入(已配置 `FETCHCONTENT_UPDATES_DISCONNECTED`);
+- **尚无**:多标的 Exchange 层、tick 定价、benchmark 套件(分别属 Stage 1/2)。
 
-已知问题清单(Stage 0 的输入):
+已知问题清单:
 
 | # | 问题 | 位置 | 状态 |
 |---|---|---|---|
-| 1 | 协议表仍写已改名的 GTC | README.md 协议表 | 已修(2026-09-24 随 ROADMAP 建立) |
-| 2 | parser 对未知订单类型 token 静默按 GFD 处理 | `src/io/parser.cpp` | 待修(Stage 0) |
-| 3 | 无 CI / lint / benchmark | 仓库级 | 待建(Stage 0/2) |
+| 1 | 协议表仍写已改名的 GTC | README.md 协议表 | 已修(2026-09-24) |
+| 2 | parser 对未知订单类型 token 静默按 GFD 处理 | `src/io/parser.cpp` | 已修(2026-09-25,+2 测试) |
+| 3 | 无 CI / lint / benchmark | 仓库级 | CI 与 lint 已建(2026-09-25);benchmark 属 Stage 2 |
 | 4 | `InvalidPrice`/`InvalidQuantity` 拒绝原因已定义但未使用 | `include/hft/core/types.hpp` | Stage 1 随 tick 定价启用 |
+| 5 | missing-field-initializers 编译警告(原有) | `src/book/order_book.cpp:130,136`、`tests/test_price_level.cpp` | Stage 1 顺手清 |
 
 ---
 
@@ -131,8 +132,8 @@
 
 | Stage | 主题 | 一句话目标 | 状态 | 量级 |
 |---|---|---|---|---|
-| 0 | 工程基座与记录体系 | CI、lint、修已知 bug、记录体系就位 | **进行中** | 1–2 周 |
-| 1 | 引擎:Make it Right | tick 定价、平坦数组、多标的、回放测试 | 未开始 | 2–3 周 |
+| 0 | 工程基座与记录体系 | CI、lint、修已知 bug、记录体系就位 | ✅ 完成(2026-09-25,tag `stage-0-clear`) | 1–2 周 |
+| 1 | 引擎:Make it Right | tick 定价、平坦数组、多标的、回放测试 | **下一个** | 2–3 周 |
 | 2 | 引擎:Make it Fast | 侵入式链表、内存池、零分配、基准套件 | 未开始 | 3–4 周 |
 | 3 | 引擎:Make it Reliable | 确定性回放、WAL+快照、崩溃恢复、火焰图 | 未开始 | 2–3 周 |
 | 4 | 回测框架 | 数据→策略→模拟成交→报告,确定性回测 | 未开始 | 4–6 周 |

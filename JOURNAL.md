@@ -8,9 +8,9 @@
 ## 当前状态块(每次工作会话结束时更新)
 
 - **最后更新**:2026-09-25
-- **当前阶段**:Stage 0 — 工程基座与记录体系(进行中)
-- **已完成(本阶段)**:ROADMAP.md 建立、过程记录建立(含 Iteration 1 回填)、README 修复、仓库整理(移除参考项目 submodule、过程文档拆分为 `docs/journal/` 单文件、删除 superpowers 残留),全部已推送
-- **下一步**:Stage 0 剩余任务 —— ① GitHub Actions CI(build+ctest,ASan/UBSan job)② .clang-format/.clang-tidy 并全仓 format ③ 修 parser 静默 GFD bug + 补测试
+- **当前阶段**:Stage 0 已完成(Gate 全过,tag `stage-0-clear`);下一个阶段 **Stage 1(引擎 Make it Right)待启动**
+- **已完成(Stage 0)**:parser 静默 GFD bug 修复(+2 测试,41→43)、.clang-format/.clang-tidy + 全仓格式化、GitHub Actions CI 三任务全绿(构建+测试 / ASan+UBSan / lint)、gtest 发现模式串注册问题修复、VS Code 本地运行配置
+- **下一步**:Stage 1 启动 —— ① tick 定价与价格校验 ② 平坦数组价格档位 ③ 多标的 Exchange 层 ④ golden replay + invariant 随机化测试(详见 ROADMAP §5)
 - **状态权威说明**:本块 > ROADMAP.md §4 > README.md;新对话开工先读本块与索引中最新的 1–2 条记录
 
 ## 条目模板
@@ -45,3 +45,4 @@
 | 2026-09-25 | [references-submodule](docs/journal/2026-09-25-references-submodule.md) | 文档推送;参考项目 submodule(当天即撤销,见下一行) |
 | 2026-09-25 | [docs-reorg](docs/journal/2026-09-25-docs-reorg.md) | 仓库整理:移除 submodule、拆分过程文档、删 superpowers 残留 |
 | 2026-09-25 | [readme-chinese](docs/journal/2026-09-25-readme-chinese.md) | README 中文化,统一仓库文档语言 |
+| 2026-09-25 | [stage0-clear](docs/journal/2026-09-25-stage0-clear.md) | Stage 0 完成:CI 全绿、43/43、lint 干净,过 Gate(含 gtest 串注册踩坑) |
