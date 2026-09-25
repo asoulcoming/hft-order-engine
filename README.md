@@ -100,7 +100,10 @@ gates live in [ROADMAP.md](ROADMAP.md); progress is logged in [JOURNAL.md](JOURN
 
 ## References
 
-Built with reference to three open-source matching engines:
+Three open-source matching engines, vendored as git submodules under
+`references/` (clone this repo with `--recursive`, or run
+`git submodule update --init --recursive` in an existing checkout):
+
 - [Simple-HFT-Engine](https://github.com/saksham10arora-dotcom/Simple-HFT-Engine)
 - [low-latency-matching-engine](https://github.com/erictzhou/low-latency-matching-engine)
 - [order-matching-engine](https://github.com/PIYUSH-KUMAR1809/order-matching-engine)

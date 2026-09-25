@@ -1,0 +1,9 @@
+[submodule "references/Simple-HFT-Engine"]
+	path = references/Simple-HFT-Engine
+	url = https://github.com/saksham10arora-dotcom/Simple-HFT-Engine.git
+[submodule "references/low-latency-matching-engine"]
+	path = references/low-latency-matching-engine
+	url = https://github.com/erictzhou/low-latency-matching-engine.git
+[submodule "references/order-matching-engine"]
+	path = references/order-matching-engine
+	url = https://github.com/PIYUSH-KUMAR1809/order-matching-engine.git

@@ -6,9 +6,9 @@
 
 ## 当前状态块(每次工作会话结束时更新)
 
-- **最后更新**:2026-09-24
+- **最后更新**:2026-09-25
 - **当前阶段**:Stage 0 — 工程基座与记录体系(进行中)
-- **已完成(本阶段)**:ROADMAP.md 建立、JOURNAL.md 建立(本文件,含 Iteration 1 回填)、README 修复(GTC 残留、指向 ROADMAP)
+- **已完成(本阶段)**:ROADMAP.md 建立、JOURNAL.md 建立(含 Iteration 1 回填)、README 修复、文档提交已推送;三个参考项目以 git submodule 固化到 `references/`(HTTPS 地址,换电脑 `git clone --recursive` 即得),ROADMAP 路径引用同步改为 `references/`
 - **下一步**:Stage 0 剩余任务 —— ① GitHub Actions CI(build+ctest,ASan/UBSan job)② .clang-format/.clang-tidy 并全仓 format ③ 修 parser 静默 GFD bug + 补测试
 - **状态权威说明**:本块 > ROADMAP.md §4 > README.md;新对话开工先读本块与最后 3 条记录
 
@@ -98,3 +98,25 @@
 
 **下一步**:
 - Stage 0 剩余:CI、clang-format/tidy、parser 静默 GFD bug(详见状态块)。
+
+### 2026-09-25 | Stage 0 | 文档推送;参考项目以 submodule 固化进仓库
+
+**做了什么**:
+- 推送文档提交到 origin/main(cf0bccd..ab61bc2);
+- 三个参考项目以 git submodule 加入 `references/` 目录(Simple-HFT-Engine、low-latency-matching-engine、order-matching-engine);
+- ROADMAP.md 中所有 `../xxx` 兄弟目录路径引用改为 `references/xxx`,§5 头部说明同步更新;
+- README.md References 节更新为 submodule 说明(`git clone --recursive` / `git submodule update --init --recursive`)。
+
+**决策与理由**:
+- submodule vs 复制源码 vs 仅留链接:submodule 把参考依赖变成仓库的一部分(换电脑一条 clone 命令即得)、不复制代码无许可问题、且**锁定参考时的 commit 版本**(参考项目以后更新不会悄悄改变 ROADMAP 里引用的行号与内容);
+- submodule URL 用 HTTPS 而非 SSH:换新机器没有配 SSH key 也能拉取。
+
+**数据与证据**:
+- `.gitmodules` 三条记录;`git push` 成功(cf0bccd..ab61bc2)。
+
+**踩坑**:
+- 无。
+
+**下一步**:
+- Stage 0 剩余:CI、clang-format/tidy、parser 静默 GFD bug。
+
