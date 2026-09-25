@@ -1,0 +1,23 @@
+# clang-tidy 检查集:先开高信号子集,避免告警风暴(Stage 0 决策)
+# 排除项理由:
+#   bugprone-easily-swappable-parameters  — 解析器/撮合接口天然有同类型参数,无法避免
+#   modernize-use-trailing-return-type    — 与现有 auto f() 风格二选一,保持现状
+#   readability-function-cognitive-complexity — Parser::parse 的命令分派天然复杂,拆分反而伤可读性
+#   readability-identifier-length         — id/qty/ss 等短名是领域惯例
+#   readability-magic-numbers             — 测试与解析边界值大量使用字面量
+#   readability-implicit-bool-conversion  — if (ss >> token) 是流式解析惯用法
+Checks: >
+  -*,
+  bugprone-*,
+  performance-*,
+  modernize-*,
+  readability-*,
+  -bugprone-easily-swappable-parameters,
+  -modernize-use-trailing-return-type,
+  -readability-function-cognitive-complexity,
+  -readability-identifier-length,
+  -readability-magic-numbers,
+  -readability-implicit-bool-conversion
+WarningsAsErrors: ''
+HeaderFilterRegex: 'include/hft/.*'
+FormatStyle: file

@@ -1,18 +1,16 @@
 #include "hft/book/order_book.hpp"
-#include <sstream>
 #include <algorithm>
+#include <sstream>
 
 namespace hft {
 
 // ── 订单存储 ─────────────────────────────────────────────
 Order* OrderBook::store_order(Order order) {
     auto [it, _] = orders_.insert_or_assign(order.id, order);
-    return &it->second;  // map 的引用稳定，返回指针指向这里
+    return &it->second; // map 的引用稳定，返回指针指向这里
 }
 
-void OrderBook::erase_order(OrderId id) {
-    orders_.erase(id);
-}
+void OrderBook::erase_order(OrderId id) { orders_.erase(id); }
 
 // ── FOK 可行性检查 ─────────────────────────────────────
 // 遍历对面订单簿，累加可用量，判断能否完全吃下
@@ -21,20 +19,24 @@ bool OrderBook::can_fill_fok(const Order& order) const {
 
     if (order.side == Side::Buy) {
         for (const auto& [price, level] : asks_) {
-            if (order.price < price) break;  // 价格不交叉，停止
+            if (order.price < price)
+                break; // 价格不交叉，停止
             Quantity take = std::min(needed, level.total_volume);
             needed -= take;
-            if (needed == 0) return true;
+            if (needed == 0)
+                return true;
         }
     } else {
         for (const auto& [price, level] : bids_) {
-            if (order.price > price) break;
+            if (order.price > price)
+                break;
             Quantity take = std::min(needed, level.total_volume);
             needed -= take;
-            if (needed == 0) return true;
+            if (needed == 0)
+                return true;
         }
     }
-    return false;  // 吃不完，FOK 失败
+    return false; // 吃不完，FOK 失败
 }
 
 // ── 主动撮合 ────────────────────────────────────────────
@@ -49,24 +51,23 @@ void OrderBook::match_aggressive(Order& taker, std::vector<Event>& out) {
 
             // 限价单：买方出价低于最低卖价 → 无法成交，停止
             // 市价单：入参时已设 price=INT64_MAX，永远不会走到这里
-            if (taker.price < best_ask) break;
+            if (taker.price < best_ask)
+                break;
 
             Order* maker = level.front();
             Quantity fill_qty = std::min(taker.remaining(), maker->remaining());
 
-            out.push_back(TradeEvent{
-                maker->id, taker.id, maker->price, fill_qty
-            });
+            out.push_back(TradeEvent{maker->id, taker.id, maker->price, fill_qty});
 
             taker.filled_qty += fill_qty;
             maker->filled_qty += fill_qty;
             level.total_volume -= fill_qty;
 
             if (maker->is_filled()) {
-                level.pop_front();       // 从队列移除
-                erase_order(maker->id);  // 从存储删除
+                level.pop_front();      // 从队列移除
+                erase_order(maker->id); // 从存储删除
                 if (level.empty()) {
-                    asks_.erase(it);     // 价位清空 → 删除整个档位
+                    asks_.erase(it); // 价位清空 → 删除整个档位
                 }
             }
         }
@@ -77,14 +78,13 @@ void OrderBook::match_aggressive(Order& taker, std::vector<Event>& out) {
             const Price best_bid = it->first;
             PriceLevel& level = it->second;
 
-            if (taker.price > best_bid) break;
+            if (taker.price > best_bid)
+                break;
 
             Order* maker = level.front();
             Quantity fill_qty = std::min(taker.remaining(), maker->remaining());
 
-            out.push_back(TradeEvent{
-                maker->id, taker.id, maker->price, fill_qty
-            });
+            out.push_back(TradeEvent{maker->id, taker.id, maker->price, fill_qty});
 
             taker.filled_qty += fill_qty;
             maker->filled_qty += fill_qty;
@@ -160,7 +160,7 @@ void OrderBook::cancel(OrderId order_id, std::vector<Event>& out) {
         auto level_it = bids_.find(price);
         level_it->second.remove(order_id);
         if (level_it->second.empty()) {
-            bids_.erase(level_it);  // 价位空了就删除整个档位
+            bids_.erase(level_it); // 价位空了就删除整个档位
         }
     } else {
         auto level_it = asks_.find(price);
@@ -256,9 +256,7 @@ void OrderBook::print(std::vector<Event>& out) const {
     out.push_back(SnapshotEvent{oss.str()});
 }
 
-bool OrderBook::contains(OrderId id) const {
-    return orders_.contains(id);
-}
+bool OrderBook::contains(OrderId id) const { return orders_.contains(id); }
 
 // ── 调试快照（供测试验证订单簿结构）────────────────────
 OrderBook::DebugSnapshot OrderBook::debug_snapshot() const {

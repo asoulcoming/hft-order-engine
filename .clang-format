@@ -1,0 +1,10 @@
+# 代码风格:基于 LLVM,贴近仓库既有习惯
+# - 4 空格缩进,行宽 100
+# - 引用/指针绑左边(Type& name / Type* name)
+# - 访问修饰符(public/private)顶格
+BasedOnStyle: LLVM
+IndentWidth: 4
+ColumnLimit: 100
+AccessModifierOffset: -4
+DerivePointerAlignment: false
+PointerAlignment: Left

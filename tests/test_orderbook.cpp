@@ -53,7 +53,8 @@ TEST(OrderBookTest, NoMatchWhenSpread) {
 
     bool has_trade = false;
     for (const auto& e : events) {
-        if (std::holds_alternative<TradeEvent>(e)) has_trade = true;
+        if (std::holds_alternative<TradeEvent>(e))
+            has_trade = true;
     }
     EXPECT_FALSE(has_trade);
 
@@ -121,7 +122,8 @@ TEST(OrderBookTest, CrossPriceSweep) {
 
     int trade_count = 0;
     for (const auto& e : events) {
-        if (std::holds_alternative<TradeEvent>(e)) trade_count++;
+        if (std::holds_alternative<TradeEvent>(e))
+            trade_count++;
     }
     EXPECT_EQ(trade_count, 2);
 
@@ -171,8 +173,10 @@ TEST(OrderBookTest, CancelMiddleOfQueue) {
     bool hit1 = false, hit3 = false;
     for (const auto& e : events) {
         if (auto* t = std::get_if<TradeEvent>(&e)) {
-            if (t->resting_id == 1) hit1 = true;
-            if (t->resting_id == 3) hit3 = true;
+            if (t->resting_id == 1)
+                hit1 = true;
+            if (t->resting_id == 3)
+                hit3 = true;
         }
     }
     EXPECT_TRUE(hit1);

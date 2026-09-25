@@ -18,8 +18,7 @@ public:
     // 撤单
     void cancel(OrderId order_id, std::vector<Event>& out);
     // 改单（等价于撤单 + 重新下单）
-    void modify(OrderId order_id, Price new_price, Quantity new_qty,
-                std::vector<Event>& out);
+    void modify(OrderId order_id, Price new_price, Quantity new_qty, std::vector<Event>& out);
     // 市价单（吃尽对方流动性，不挂单）
     void market(Order order, std::vector<Event>& out);
     // 打印订单簿快照
@@ -30,9 +29,9 @@ public:
 
     // ── 调试接口（供测试使用）──
     struct DebugLevel {
-        Price                 price;
-        Quantity              volume;
-        std::vector<OrderId>  order_ids;
+        Price price;
+        Quantity volume;
+        std::vector<OrderId> order_ids;
     };
     struct DebugSnapshot {
         std::vector<DebugLevel> bids;
@@ -55,7 +54,7 @@ private:
     // 存储订单并返回稳定指针
     Order* store_order(Order order);
     // 从存储中删除订单
-    void   erase_order(OrderId id);
+    void erase_order(OrderId id);
 };
 
 } // namespace hft
